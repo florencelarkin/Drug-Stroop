@@ -43,6 +43,20 @@
 
     var timeline = [];
 
+   //array of words used as stimulus
+   //edit based on population
+    var words = [
+      'cocaine',
+    ];
+
+    var practiceStimuli = [
+    { stimulus: '<p style="color: #117733; font-size:60px; font-weight:bold;">green</p>', data:{color:'green', correct_response: 1}},
+    { stimulus: '<p style="color: #DDCC77; font-size:60px; font-weight:bold;">yellow</p>', data:{color:'yellow', correct_response: 0}},
+    { stimulus: '<p style="color: #88CCEE; font-size:60px; font-weight:bold;">blue</p>', data:{color:'blue', correct_response: 3}},
+    { stimulus: '<p style="color: #AA4499; font-size:60px; font-weight:bold;">magenta</p>', data:{color:'magenta', correct_response: 2}},
+
+    ];
+
 var stroopStimuli = [
     { stimulus: '<p style="color: #117733; font-size:60px; font-weight:bold;">drug</p>', data:{color:'green', correct_response: 1}},
     { stimulus: '<p style="color: #DDCC77; font-size:60px; font-weight:bold;">drug</p>', data:{color:'yellow', correct_response: 0}},
@@ -54,6 +68,27 @@ var stroopStimuli = [
     { stimulus: '<p style="color: #AA4499; font-size:60px; font-weight:bold;">neutral</p>', data:{color:'magenta', correct_response: 2}},
 
   ];
+
+  var practice_instructions_1 = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '<p>In this task you will see words written in different colored fonts appear on the screen.<br>When you see a word, press the button whose color corresponds to the color of the font the word is written in.</p>',
+        choices: ['NEXT'],
+
+    }
+
+    var practice_instructions_2 = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '<p>Before we start the task there will be short practice section.<br>Click next to begin</p>',
+        choices: ['NEXT'],
+
+    }
+
+    var task_instructions = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '<p>The real task will have different words.<br>Still respond based on the FONT COLOR of the word.<br>Press next to begin the task</p>',
+        choices: ['NEXT'],
+
+    }
 
 var fixation = {
     type: jsPsychHtmlButtonResponse,
@@ -80,12 +115,37 @@ var stroop = {
       }
 };
 
+var practice = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: jsPsych.timelineVariable('stimulus'),
+    choices: ['y', 'g', 'm', 'b'],
+    button_html: ['<button class="buttonYellow" style="height:40px;width:50px"></button>', '<button class="buttonGreen" style="height:40px;width:50px"></button>', '<button class="buttonMagenta" style="height:40px;width:50px"></button>', '<button class="buttonBlue" style="height:40px;width:50px"></button>'],
+    trial_duration: 1000,
+    data: {
+        task: 'response',
+    },
+    on_finish: function(data){
+        data.response === data.correct_response ? data.correct = true : data.correct = false;
+      }
+};
+
+var practiceProcedure = {
+    timeline: [fixation, practice],
+    timeline_variables: practiceStimuli,
+    randomize_order: true,
+    repetitions: 2,
+  }
+
 var testProcedure = {
     timeline: [fixation, stroop],
     timeline_variables: stroopStimuli,
     randomize_order: true,
   }
 
+  timeline.push(practice_instructions_1);
+  timeline.push(practice_instructions_2);
+  timeline.push(practiceProcedure);
+  timeline.push(task_instructions);
   timeline.push(testProcedure);
     /*start task*/
       jsPsych.run(timeline);
